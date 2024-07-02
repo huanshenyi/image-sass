@@ -1,9 +1,12 @@
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
 import { Textarea } from "@/components/Textarea";
-import { db } from "@/server/db/db";
+import { getServerSession } from "@/server/auth";
+import { redirect } from "next/navigation";
 
 export default async function Home() {
+  const session = await getServerSession();
+
   return (
     <div className="h-screen flex justify-center items-center">
       <form className="w-full max-w-md flex flex-col gap-4">
