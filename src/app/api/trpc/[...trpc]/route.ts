@@ -1,5 +1,6 @@
-import { testRouter } from "@/utils/trpc";
+import { createContext, testRouter } from "@/utils/trpc";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
+import { getSession } from "next-auth/react";
 import { NextRequest } from "next/server";
 
 const handler = (request: NextRequest) => {
@@ -7,7 +8,7 @@ const handler = (request: NextRequest) => {
     endpoint: "/api/trpc",
     req: request,
     router: testRouter,
-    createContext: () => ({}),
+    createContext: createContext,
   });
 };
 
