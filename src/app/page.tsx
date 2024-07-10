@@ -1,11 +1,15 @@
+'use client'
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
 import { Textarea } from "@/components/Textarea";
-import { getServerSession } from "@/server/auth";
-import { redirect } from "next/navigation";
+import { trpcClient } from "@/utils/api";
+import { useEffect } from "react";
 
-export default async function Home() {
-  const session = await getServerSession();
+export default function Home() {
+
+  useEffect(() => {
+    trpcClient.hello.query().then(console.log)
+  },[])
 
   return (
     <div className="h-screen flex justify-center items-center">
