@@ -1,4 +1,5 @@
 import { TRPCError, initTRPC } from "@trpc/server";
+import { createCallerFactory } from "@trpc/server/unstable-core-do-not-import";
 import { getSession } from "next-auth/react";
 
 export async function createContext() {
@@ -15,7 +16,6 @@ const { router, procedure } = t;
 const middleware = t.middleware(async ({ ctx, next }) => {
   const start = Date.now();
   const result = await next();
-  console.log(`Took ${Date.now() - start}ms`);
   return result;
 });
 
@@ -41,3 +41,5 @@ export const testRouter = router({
 });
 
 export type TestRouter = typeof testRouter;
+
+export const serverCaller = createCallerFactory()(testRouter);
