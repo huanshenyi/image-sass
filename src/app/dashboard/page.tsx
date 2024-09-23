@@ -4,22 +4,27 @@ import { Uppy } from "@uppy/core";
 import AWSS3 from "@uppy/aws-s3";
 import { useState } from "react";
 import { useUppyState } from "./useUppyStatus";
+import { trpcPureClient } from "@/utils/api";
+import { Button } from "@/components/Button";
 
 export default function Dashboard() {
   const [uppy] = useState(() => {
     const uppy = new Uppy();
     uppy.use(AWSS3, {
       shouldUseMultipart: false,
-      getUploadParameters() {
-        return {
-          url: "", //pre signed url
-        };
+      getUploadParameters(file) {
+        return trpcPureClient.file.createPresignedUrl.mutate({
+          filename: file.data instanceof File ? file.data.name : "test",
+          contentType: file.data.type || "",
+          size: file.size,
+        });
       },
     });
     return uppy;
   });
 
   const files = useUppyState(uppy, (s) => Object.values(s.files));
+  const progress = useUppyState(uppy, (s) => s.totalProgress);
 
   return (
     <div className="h-screen flex justify-center items-center">
@@ -29,7 +34,6 @@ export default function Dashboard() {
           if (e.target.files) {
             Array.from(e.target.files).forEach((file) => {
               uppy.addFile({
-                name: file.name,
                 data: file,
               });
             });
@@ -41,6 +45,14 @@ export default function Dashboard() {
         const url = URL.createObjectURL(file.data);
         return <img src={url} key={file.id}></img>;
       })}
+      <Button
+        onClick={() => {
+          uppy.upload();
+        }}
+      >
+        Upload
+      </Button>
+      <div>{progress}</div>
     </div>
   );
 }

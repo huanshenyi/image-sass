@@ -8,7 +8,9 @@ import GithubProvider from "next-auth/providers/github";
 import { Adapter } from "next-auth/adapters";
 
 export const authOptions: AuthOptions = {
-  // Configure one or more authentication providers
+  session: {
+    strategy: "jwt",
+  },
   adapter: DrizzleAdapter(db) as Adapter,
   providers: [
     GithubProvider({
