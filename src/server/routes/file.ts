@@ -6,6 +6,10 @@ import {
   PutObjectCommandInput,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { db } from "../db/db";
+import { files } from "../db/schema";
+import { v4 as uuid } from "uuid";
+
 const bucket = process.env.AWS_BUCKET;
 const region = process.env.AWS_REGION;
 const endpoint = `https://s3.${region}.amazonaws.com/${bucket}`;
@@ -50,5 +54,29 @@ export const fileRoutes = router({
         url,
         method: "PUT" as const,
       };
+    }),
+  saveFile: protectedProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        path: z.string(),
+        type: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { session } = ctx;
+      const url = new URL(input.path);
+      const photo = await db
+        .insert(files)
+        .values({
+          ...input,
+          id: uuid(),
+          path: url.pathname,
+          url: url.toString(),
+          userId: session.user.id,
+          contentType: input.type,
+        })
+        .returning();
+      return photo[0];
     }),
 });

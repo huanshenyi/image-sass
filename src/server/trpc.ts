@@ -1,6 +1,5 @@
-import { getServerSession } from "next-auth";
+import { getServerSession } from "@/server/auth";
 import { TRPCError, initTRPC } from "@trpc/server";
-import { Session } from "next-auth";
 
 // export async function createContext() {
 //   const session = await getSession();
@@ -39,6 +38,7 @@ export const withLoggerProcedure = procedure.use(async ({ ctx, next }) => {
 
 export const withSessionMiddleware = t.middleware(async ({ ctx, next }) => {
   const session = await getServerSession();
+  console.log(session);
   return next({
     ctx: {
       session,
