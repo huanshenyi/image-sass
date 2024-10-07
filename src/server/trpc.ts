@@ -38,7 +38,6 @@ export const withLoggerProcedure = procedure.use(async ({ ctx, next }) => {
 
 export const withSessionMiddleware = t.middleware(async ({ ctx, next }) => {
   const session = await getServerSession();
-  console.log(session);
   return next({
     ctx: {
       session,
