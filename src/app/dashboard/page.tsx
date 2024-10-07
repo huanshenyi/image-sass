@@ -4,8 +4,10 @@ import { UploadSuccessCallback, Uppy } from "@uppy/core";
 import AWSS3 from "@uppy/aws-s3";
 import { useEffect, useState } from "react";
 import { useUppyState } from "./useUppyStatus";
-import { trpcPureClient } from "@/utils/api";
-import { Button } from "@/components/Button";
+import { trpcClientReact, trpcPureClient } from "@/utils/api";
+import { Button } from "@/components/ui/Button";
+import { UploadButton } from "@/components/feature/UploadButton";
+import Image from "next/image";
 
 export default function Dashboard() {
   const [uppy] = useState(() => {
@@ -42,32 +44,50 @@ export default function Dashboard() {
     };
   }, [uppy]);
 
+  const { data: fileList, isPending } =
+    trpcClientReact.file.listFiles.useQuery();
+
+  // fileの表示は署名付きurl使ったほうがいい、よりセキュアな方法
   return (
-    <div className="h-screen flex justify-center items-center">
-      <input
-        type="file"
-        onChange={(e) => {
-          if (e.target.files) {
-            Array.from(e.target.files).forEach((file) => {
-              uppy.addFile({
-                data: file,
-              });
-            });
-          }
-        }}
-        multiple
-      ></input>
+    <div className="container mx-auto">
+      <div>
+        <UploadButton uppy={uppy}></UploadButton>
+        <Button
+          onClick={() => {
+            uppy.upload();
+          }}
+        >
+          Upload
+        </Button>
+      </div>
+      {isPending && <div>loding...</div>}
+      <div className="flex flex-wrap gap-4">
+        {fileList?.map((file) => {
+          const isImage = file.contentType.startsWith("image");
+          return (
+            <div
+              key={file.id}
+              className="w-56 h-56 flex justify-center items-center border"
+            >
+              {isImage ? (
+                <img src={file.url} alt={file.name} />
+              ) : (
+                <Image
+                  alt=""
+                  src="/unknown-file-types.png"
+                  width={100}
+                  height={100}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+
       {files.map((file) => {
         const url = URL.createObjectURL(file.data);
         return <img src={url} key={file.id}></img>;
       })}
-      <Button
-        onClick={() => {
-          uppy.upload();
-        }}
-      >
-        Upload
-      </Button>
       <div>{progress}</div>
     </div>
   );
