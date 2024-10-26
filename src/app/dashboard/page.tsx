@@ -10,6 +10,7 @@ import { UploadButton } from "@/components/feature/UploadButton";
 import Image from "next/image";
 import { Dropzone } from "@/components/feature/Dropzone";
 import { cn } from "@/lib/utils";
+import { usePasteFile } from "@/components/hooks/usePasteFile";
 
 export default function Dashboard() {
   const [uppy] = useState(() => {
@@ -53,6 +54,17 @@ export default function Dashboard() {
 
   const { data: fileList, isPending } =
     trpcClientReact.file.listFiles.useQuery();
+
+  // ファイルのコピーぺー対応する
+  usePasteFile({
+    onFilesPaste: (files) => {
+      uppy.addFiles(
+        files.map((file) => ({
+          data: file,
+        }))
+      );
+    },
+  });
 
   // fileの表示は署名付きurl使ったほうがいい、よりセキュアな方法
   return (
