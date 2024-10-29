@@ -11,6 +11,7 @@ import Image from "next/image";
 import { Dropzone } from "@/components/feature/Dropzone";
 import { cn } from "@/lib/utils";
 import { usePasteFile } from "@/components/hooks/usePasteFile";
+import { UploadPreview } from "@/components/feature/UploadPreview";
 
 export default function Dashboard() {
   const [uppy] = useState(() => {
@@ -27,10 +28,6 @@ export default function Dashboard() {
     });
     return uppy;
   });
-
-  const files = useUppyState(uppy, (s) => Object.values(s.files));
-  // アップロードの進捗
-  const progress = useUppyState(uppy, (s) => s.totalProgress);
 
   useEffect(() => {
     // アップロード成功時のコールバック関数
@@ -69,8 +66,7 @@ export default function Dashboard() {
   // fileの表示は署名付きurl使ったほうがいい、よりセキュアな方法
   return (
     <div className="container mx-auto p-2">
-      <div>
-        <UploadButton uppy={uppy}></UploadButton>
+      <div className="flex justify-between items-center mb-4">
         <Button
           onClick={() => {
             uppy.upload();
@@ -78,6 +74,7 @@ export default function Dashboard() {
         >
           Upload
         </Button>
+        <UploadButton uppy={uppy}></UploadButton>
       </div>
       {isPending && <div>loding...</div>}
       <Dropzone uppy={uppy}>
@@ -118,11 +115,7 @@ export default function Dashboard() {
           );
         }}
       </Dropzone>
-      {files.map((file) => {
-        const url = URL.createObjectURL(file.data);
-        return <img src={url} key={file.id}></img>;
-      })}
-      <div>{progress}</div>
+      <UploadPreview uppy={uppy}></UploadPreview>
     </div>
   );
 }
