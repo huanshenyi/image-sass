@@ -90,7 +90,9 @@ export function UploadPreview({ uppy }: { uppy: Uppy }) {
           </Button>
           <Button
             onClick={() => {
-              clear();
+              uppy.upload().then(() => {
+                clear();
+              });
             }}
           >
             Upload All

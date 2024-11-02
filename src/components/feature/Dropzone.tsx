@@ -1,7 +1,7 @@
 "use client";
 
 import Uppy from "@uppy/core";
-import { ReactNode, useState, useRef } from "react";
+import { ReactNode, useState, useRef, HTMLAttributes } from "react";
 
 /**
  * Dropzoneコンポーネント
@@ -17,15 +17,18 @@ import { ReactNode, useState, useRef } from "react";
 export function Dropzone({
   uppy,
   children,
+  ...divProps
 }: {
   uppy: Uppy;
   children: ReactNode | ((draging: boolean) => ReactNode);
-}) {
+} & Omit<HTMLAttributes<HTMLDivElement>, "children">) {
   const [darging, setDarging] = useState(false); // ドラッグ中の状態
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null); // ドラッグ状態の解除用タイマー
 
   return (
     <div
+      // 先に配置する必要がある,でなければ失効する
+      {...divProps}
       // ドラッグエリアにファイルが入った時の処理
       onDragEnter={(e) => {
         e.preventDefault();
